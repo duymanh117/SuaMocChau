@@ -177,25 +177,82 @@
                 </div>
             </div>
 
-            <!-- VIEW: ACCOUNT (Simple Placeholder) -->
-            <div id="view-user" class="hidden px-4 pt-10 flex flex-col items-center">
-                <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-md">
-                    <i class="fa-solid fa-user text-3xl text-gray-400"></i>
+            <!-- VIEW: ACCOUNT (Dynamic) -->
+            <div id="view-user" class="hidden px-4 pt-10 flex flex-col h-full">
+                <!-- Logged In State (injected via JS) -->
+                <div id="user-logged-in" class="hidden flex-col items-center">
+                    <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-md">
+                        <i class="fa-solid fa-user text-3xl text-gray-400"></i>
+                    </div>
+                    <h3 id="profile-name" class="font-bold text-lg">Guest User</h3>
+                    <p id="profile-email" class="text-gray-500 text-sm mb-6">member@mocchaumilk.com</p>
+                    
+                    <div class="w-full space-y-2">
+                        <button class="w-full bg-white border border-gray-200 p-3 rounded-xl text-left flex items-center gap-3">
+                            <i class="fa-solid fa-clipboard-list text-brand"></i> Order History
+                        </button>
+                        <button class="w-full bg-white border border-gray-200 p-3 rounded-xl text-left flex items-center gap-3">
+                            <i class="fa-solid fa-location-dot text-brand"></i> My Addresses
+                        </button>
+                        <button onclick="handleLogout()" class="w-full bg-white border border-gray-200 p-3 rounded-xl text-left flex items-center gap-3 text-red-500 mt-4">
+                            <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                        </button>
+                    </div>
                 </div>
-                <h3 class="font-bold text-lg">Guest User</h3>
-                <p class="text-gray-500 text-sm mb-6">Join Member for exclusive deals</p>
-                
-                <div class="w-full space-y-2">
-                    <button class="w-full bg-white border border-gray-200 p-3 rounded-xl text-left flex items-center gap-3">
-                        <i class="fa-solid fa-clipboard-list text-brand"></i> Order History
+
+                <!-- Guest State -->
+                <div id="user-guest" class="flex flex-col items-center justify-center h-full pb-20">
+                    <div class="w-24 h-24 bg-green-50 rounded-full flex items-center justify-center mb-6 text-brand">
+                        <i class="fa-solid fa-cow text-4xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome!</h2>
+                    <p class="text-gray-500 text-center mb-8 px-8">Sign in or register to track orders and receive exclusive milk offers.</p>
+                    
+                    <button onclick="switchToRegister()" class="w-full bg-brand text-white py-3 rounded-xl font-bold shadow-lg shadow-green-200 active:scale-95 transition mb-3">
+                        Create Account
                     </button>
-                    <button class="w-full bg-white border border-gray-200 p-3 rounded-xl text-left flex items-center gap-3">
-                        <i class="fa-solid fa-location-dot text-brand"></i> My Addresses
-                    </button>
-                    <button class="w-full bg-white border border-gray-200 p-3 rounded-xl text-left flex items-center gap-3 text-red-500">
-                        <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                    <button onclick="showToast('Login feature coming soon')" class="w-full bg-white border border-brand text-brand py-3 rounded-xl font-bold active:scale-95 transition">
+                        Log In
                     </button>
                 </div>
+            </div>
+
+            <!-- VIEW: REGISTER -->
+            <div id="view-register" class="hidden px-6 pt-6 flex flex-col h-full bg-white absolute top-0 left-0 w-full z-30 animate-fade-in">
+                <div class="flex items-center mb-6">
+                    <button onclick="switchTab('user')" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 mr-3">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <h2 class="text-xl font-bold text-gray-800">Sign Up</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Full Name</label>
+                        <input id="reg-name" type="text" placeholder="e.g. Nguyen Van A" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Phone Number</label>
+                        <input id="reg-phone" type="tel" placeholder="0912 345 678" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Password</label>
+                        <input id="reg-pass" type="password" placeholder="••••••••" class="w-full p-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand">
+                    </div>
+                    
+                    <div class="flex items-center gap-2 mt-2">
+                        <input type="checkbox" id="terms" class="accent-green-600 w-4 h-4">
+                        <label for="terms" class="text-xs text-gray-500">I agree to the <span class="text-brand font-bold">Terms & Conditions</span></label>
+                    </div>
+                </div>
+
+                <button onclick="handleRegister()" class="w-full bg-brand text-white py-3 rounded-xl font-bold shadow-lg shadow-green-200 active:scale-95 transition mt-8">
+                    Register
+                </button>
+
+                <p class="text-center text-sm text-gray-500 mt-6">
+                    Already have an account? <span onclick="switchTab('user'); showToast('Please login')" class="text-brand font-bold cursor-pointer">Log In</span>
+                </p>
             </div>
 
         </main>
@@ -249,17 +306,23 @@
             { id: 5, name: "Cheese Stick (Kids)", price: 85, unit: "box", category: "cheese", img: "https://images.unsplash.com/photo-1624806992098-b8ce17d23a63?q=80&w=400&auto=format&fit=crop" },
             { id: 6, name: "Organic Yogurt Plain", price: 45, unit: "cup", category: "organic", img: "https://images.unsplash.com/photo-1488477184539-778db12191b7?q=80&w=400&auto=format&fit=crop" },
             { id: 7, name: "Strawberry Milk 180ml", price: 320, unit: "box", category: "milk", img: "https://images.unsplash.com/photo-1576186726580-a816e8b12896?q=80&w=400&auto=format&fit=crop" },
-            { id: 8, name: "Greek Yogurt", price: 60, unit: "cup", category: "yogurt", img: "https://images.unsplash.com/photo-1571026456044-a0d4c8033604?q=80&w=400&auto=format&fit=crop" }
+            { id: 8, name: "Greek Yogurt", price: 60, unit: "cup", category: "yogurt", img: "https://images.unsplash.com/photo-1571026456044-a0d4c8033604?q=80&w=400&auto=format&fit=crop" },
+            { id: 9, name: "Chocolate Milk 180ml", price: 325, unit: "box", category: "milk", img: "https://images.unsplash.com/photo-1551651818-f9453986a7d6?q=80&w=400&auto=format&fit=crop" },
+            { id: 10, name: "Aloe Vera Yogurt", price: 30, unit: "cup", category: "yogurt", img: "https://images.unsplash.com/photo-1563571642068-d95eb1df4545?q=80&w=400&auto=format&fit=crop" },
+            { id: 11, name: "Unsalted Butter 200g", price: 75, unit: "pack", category: "cheese", img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?q=80&w=400&auto=format&fit=crop" },
+            { id: 12, name: "Pure Organic Milk 1L", price: 65, unit: "bottle", category: "organic", img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=400&auto=format&fit=crop" }
         ];
 
         // --- 2. STATE ---
         let cart = []; // Array of {id, qty}
         let currentTab = 'home';
+        let currentUser = null; // { name: string, phone: string }
 
         // --- 3. INIT ---
         window.onload = () => {
             renderProductGrid(productsDB.slice(0, 4), 'home-products-grid'); // Best sellers
             renderProductGrid(productsDB, 'products-grid'); // All products
+            renderUserView();
         };
 
         // --- 4. RENDER FUNCTIONS ---
@@ -349,6 +412,24 @@
             document.getElementById('cart-total').innerText = total + 'k';
         }
 
+        function renderUserView() {
+            const loggedInView = document.getElementById('user-logged-in');
+            const guestView = document.getElementById('user-guest');
+            
+            if (currentUser) {
+                loggedInView.classList.remove('hidden');
+                loggedInView.classList.add('flex');
+                guestView.classList.add('hidden');
+                
+                document.getElementById('profile-name').innerText = currentUser.name;
+                document.getElementById('profile-email').innerText = currentUser.phone;
+            } else {
+                loggedInView.classList.add('hidden');
+                loggedInView.classList.remove('flex');
+                guestView.classList.remove('hidden');
+            }
+        }
+
         // --- 5. LOGIC ACTIONS ---
 
         function addToCart(id) {
@@ -393,7 +474,7 @@
             floatCount.innerText = totalItems;
             
             // Only show float if items > 0 AND not on cart page
-            if (totalItems > 0 && currentTab !== 'cart') {
+            if (totalItems > 0 && currentTab !== 'cart' && currentTab !== 'register') {
                 floatBtn.classList.remove('scale-0');
             } else {
                 floatBtn.classList.add('scale-0');
@@ -446,13 +527,58 @@
             renderProductGrid(filtered, 'products-grid');
         }
 
+        // --- AUTH LOGIC ---
+
+        function switchToRegister() {
+            // Manually show the register view which is an overlay, not a main tab
+            document.getElementById('view-register').classList.remove('hidden');
+            // Hide cart float
+            document.getElementById('cart-float').classList.add('scale-0');
+            currentTab = 'register';
+        }
+
+        function handleRegister() {
+            const name = document.getElementById('reg-name').value;
+            const phone = document.getElementById('reg-phone').value;
+            const pass = document.getElementById('reg-pass').value;
+            const terms = document.getElementById('terms').checked;
+
+            if(!name || !phone || !pass) {
+                showToast("Please fill in all fields");
+                return;
+            }
+            if(!terms) {
+                showToast("Please agree to Terms");
+                return;
+            }
+
+            // Mock Registration
+            currentUser = { name: name, phone: phone };
+            showToast(`Welcome, <b>${name}</b>!`);
+            
+            // Switch back to user tab
+            switchTab('user');
+            
+            // Clear form
+            document.getElementById('reg-name').value = '';
+            document.getElementById('reg-phone').value = '';
+            document.getElementById('reg-pass').value = '';
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            showToast("Logged out successfully");
+            renderUserView();
+        }
+
         function switchTab(tabName) {
             currentTab = tabName;
             
-            // Hide all views
+            // Hide all views including register overlay
             ['home', 'products', 'cart', 'user'].forEach(v => {
                 document.getElementById(`view-${v}`).classList.add('hidden');
             });
+            document.getElementById('view-register').classList.add('hidden'); // Ensure reg is closed
             
             // Update Nav Colors
             document.querySelectorAll('.nav-item').forEach(el => {
@@ -467,9 +593,10 @@
 
             // Specific View Logic
             const cartFloat = document.getElementById('cart-float');
-            if (tabName === 'cart') {
-                renderCart();
-                cartFloat.classList.add('scale-0'); // Hide float button on cart page
+            if (tabName === 'cart' || tabName === 'user') {
+                if(tabName === 'cart') renderCart();
+                if(tabName === 'user') renderUserView();
+                cartFloat.classList.add('scale-0'); // Hide float button
             } else {
                 updateCartUI(); // Restore float button if needed
             }
