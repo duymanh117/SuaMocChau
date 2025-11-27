@@ -62,7 +62,7 @@
 
             <!-- Search Bar -->
             <div class="relative">
-                <input id="search-input" type="text" placeholder="Search milk, yogurt..." 
+                <input id="search-input" type="text" placeholder="Search (e.g. sua tuoi, yogurt)..." 
                        class="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm text-gray-700 focus:outline-none shadow-sm transition-all focus:ring-2 focus:ring-green-300"
                        oninput="handleSearch(this.value)">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
@@ -79,6 +79,7 @@
                 <div class="mt-4 px-4">
                     <div class="relative w-full h-40 rounded-2xl overflow-hidden shadow-lg bg-green-200">
                         <img src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=800&auto=format&fit=crop" 
+                             onerror="this.src='https://placehold.co/600x400?text=Moc+Chau+Farm'"
                              alt="Moc Chau Farm" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-6 text-white">
                             <span class="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded w-fit mb-2">HOT DEAL</span>
@@ -144,7 +145,8 @@
                 <!-- Empty State -->
                 <div id="products-empty" class="hidden flex flex-col items-center justify-center py-10 text-gray-400">
                     <i class="fa-solid fa-magnifying-glass text-4xl mb-3 opacity-50"></i>
-                    <p>No products found.</p>
+                    <p>No products found for "<span id="search-term-display"></span>"</p>
+                    <button onclick="clearSearch()" class="mt-2 text-brand font-bold text-sm">Clear Search</button>
                 </div>
             </div>
 
@@ -297,20 +299,21 @@
     </div>
 
     <script>
-        // --- 1. DATA DATABASE ---
+        // --- 1. DATA DATABASE (Enhanced with Vietnamese keywords) ---
+        // Added 'keywords' field for Vietnamese search
         const productsDB = [
-            { id: 1, name: "UHT Fresh Milk Less Sugar 180ml", price: 315, unit: "box", oldPrice: 350, discount: "-10%", category: "milk", img: "https://images.unsplash.com/photo-1563636619-e9143da7973b?q=80&w=400&auto=format&fit=crop" },
-            { id: 2, name: "Moc Chau Black Rice Yogurt", price: 120, unit: "pack", category: "yogurt", img: "https://images.unsplash.com/photo-1571212515416-f786d79a2f64?q=80&w=400&auto=format&fit=crop" },
-            { id: 3, name: "Pasteurized Fresh Milk 900ml", price: 42, unit: "bottle", category: "milk", img: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?q=80&w=400&auto=format&fit=crop" },
-            { id: 4, name: "Moc Chau Pistachio Milk", price: 55, unit: "pack", category: "milk", img: "https://images.unsplash.com/photo-1559598467-f8b76c8155d0?q=80&w=400&auto=format&fit=crop" },
-            { id: 5, name: "Cheese Stick (Kids)", price: 85, unit: "box", category: "cheese", img: "https://images.unsplash.com/photo-1624806992098-b8ce17d23a63?q=80&w=400&auto=format&fit=crop" },
-            { id: 6, name: "Organic Yogurt Plain", price: 45, unit: "cup", category: "organic", img: "https://images.unsplash.com/photo-1488477184539-778db12191b7?q=80&w=400&auto=format&fit=crop" },
-            { id: 7, name: "Strawberry Milk 180ml", price: 320, unit: "box", category: "milk", img: "https://images.unsplash.com/photo-1576186726580-a816e8b12896?q=80&w=400&auto=format&fit=crop" },
-            { id: 8, name: "Greek Yogurt", price: 60, unit: "cup", category: "yogurt", img: "https://images.unsplash.com/photo-1571026456044-a0d4c8033604?q=80&w=400&auto=format&fit=crop" },
-            { id: 9, name: "Chocolate Milk 180ml", price: 325, unit: "box", category: "milk", img: "https://images.unsplash.com/photo-1551651818-f9453986a7d6?q=80&w=400&auto=format&fit=crop" },
-            { id: 10, name: "Aloe Vera Yogurt", price: 30, unit: "cup", category: "yogurt", img: "https://images.unsplash.com/photo-1563571642068-d95eb1df4545?q=80&w=400&auto=format&fit=crop" },
-            { id: 11, name: "Unsalted Butter 200g", price: 75, unit: "pack", category: "cheese", img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?q=80&w=400&auto=format&fit=crop" },
-            { id: 12, name: "Pure Organic Milk 1L", price: 65, unit: "bottle", category: "organic", img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=400&auto=format&fit=crop" }
+            { id: 1, name: "UHT Fresh Milk Less Sugar 180ml", keywords: "sua tuoi it duong", price: 315, unit: "box", oldPrice: 350, discount: "-10%", category: "milk", img: "https://images.unsplash.com/photo-1563636619-e9143da7973b?q=80&w=400&auto=format&fit=crop" },
+            { id: 2, name: "Moc Chau Black Rice Yogurt", keywords: "sua chua nep cam", price: 120, unit: "pack", category: "yogurt", img: "https://images.unsplash.com/photo-1571212515416-f786d79a2f64?q=80&w=400&auto=format&fit=crop" },
+            { id: 3, name: "Pasteurized Fresh Milk 900ml", keywords: "sua thanh trung", price: 42, unit: "bottle", category: "milk", img: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?q=80&w=400&auto=format&fit=crop" },
+            { id: 4, name: "Moc Chau Pistachio Milk", keywords: "sua hat de cuoi", price: 55, unit: "pack", category: "milk", img: "https://images.unsplash.com/photo-1559598467-f8b76c8155d0?q=80&w=400&auto=format&fit=crop" },
+            { id: 5, name: "Cheese Stick (Kids)", keywords: "pho mai que", price: 85, unit: "box", category: "cheese", img: "https://images.unsplash.com/photo-1624806992098-b8ce17d23a63?q=80&w=400&auto=format&fit=crop" },
+            { id: 6, name: "Organic Yogurt Plain", keywords: "sua chua organic", price: 45, unit: "cup", category: "organic", img: "https://images.unsplash.com/photo-1488477184539-778db12191b7?q=80&w=400&auto=format&fit=crop" },
+            { id: 7, name: "Strawberry Milk 180ml", keywords: "sua dau tay", price: 320, unit: "box", category: "milk", img: "https://images.unsplash.com/photo-1576186726580-a816e8b12896?q=80&w=400&auto=format&fit=crop" },
+            { id: 8, name: "Greek Yogurt", keywords: "sua chua hy lap", price: 60, unit: "cup", category: "yogurt", img: "https://images.unsplash.com/photo-1571026456044-a0d4c8033604?q=80&w=400&auto=format&fit=crop" },
+            { id: 9, name: "Chocolate Milk 180ml", keywords: "sua socola", price: 325, unit: "box", category: "milk", img: "https://images.unsplash.com/photo-1551651818-f9453986a7d6?q=80&w=400&auto=format&fit=crop" },
+            { id: 10, name: "Aloe Vera Yogurt", keywords: "sua chua nha dam", price: 30, unit: "cup", category: "yogurt", img: "https://images.unsplash.com/photo-1563571642068-d95eb1df4545?q=80&w=400&auto=format&fit=crop" },
+            { id: 11, name: "Unsalted Butter 200g", keywords: "bo lat", price: 75, unit: "pack", category: "cheese", img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?q=80&w=400&auto=format&fit=crop" },
+            { id: 12, name: "Pure Organic Milk 1L", keywords: "sua tuoi nguyen chat", price: 65, unit: "bottle", category: "organic", img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?q=80&w=400&auto=format&fit=crop" }
         ];
 
         // --- 2. STATE ---
@@ -325,7 +328,27 @@
             renderUserView();
         };
 
-        // --- 4. RENDER FUNCTIONS ---
+        // --- 4. HELPER FUNCTIONS ---
+        // Converts Vietnamese string to basic latin for searching
+        function removeVietnameseTones(str) {
+            str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a"); 
+            str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e"); 
+            str = str.replace(/ì|í|ị|ỉ|ĩ/g,"i"); 
+            str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o"); 
+            str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u"); 
+            str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y"); 
+            str = str.replace(/đ/g,"d");
+            str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+            str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+            str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+            str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+            str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+            str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+            str = str.replace(/Đ/g, "D");
+            return str.toLowerCase();
+        }
+
+        // --- 5. RENDER FUNCTIONS ---
         function renderProductGrid(products, containerId) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
@@ -337,10 +360,15 @@
             if(containerId === 'products-grid') document.getElementById('products-empty').classList.add('hidden');
 
             products.forEach(p => {
+                // Fallback image if main fails
+                const fallbackImg = `https://placehold.co/400x300?text=${encodeURIComponent(p.name.split(' ').slice(0,2).join('+'))}`;
+                
                 const card = `
                 <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition">
                     <div class="relative h-32 w-full bg-gray-100 rounded-xl overflow-hidden mb-3">
-                        <img src="${p.img}" class="w-full h-full object-cover" alt="${p.name}">
+                        <img src="${p.img}" 
+                             onerror="this.onerror=null; this.src='${fallbackImg}';"
+                             class="w-full h-full object-cover" alt="${p.name}">
                         ${p.discount ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">${p.discount}</span>` : ''}
                     </div>
                     <h4 class="text-sm font-semibold text-gray-800 line-clamp-2 h-10">${p.name}</h4>
@@ -389,10 +417,11 @@
                 
                 const itemTotal = product.price * item.qty;
                 total += itemTotal;
+                const fallbackImg = `https://placehold.co/400x300?text=${encodeURIComponent(product.name.split(' ').slice(0,2).join('+'))}`;
 
                 const row = `
                 <div class="flex items-center bg-white p-3 rounded-xl border border-gray-100 gap-3">
-                    <img src="${product.img}" class="w-16 h-16 rounded-lg object-cover bg-gray-100">
+                    <img src="${product.img}" onerror="this.onerror=null; this.src='${fallbackImg}';" class="w-16 h-16 rounded-lg object-cover bg-gray-100">
                     <div class="flex-1">
                         <h4 class="text-sm font-semibold text-gray-800 line-clamp-1">${product.name}</h4>
                         <p class="text-brand font-bold text-sm">${product.price}k <span class="text-gray-400 text-xs font-normal">/${product.unit}</span></p>
@@ -430,7 +459,7 @@
             }
         }
 
-        // --- 5. LOGIC ACTIONS ---
+        // --- 6. LOGIC ACTIONS ---
 
         function addToCart(id) {
             const existingItem = cart.find(item => item.id === id);
@@ -488,20 +517,35 @@
         }
 
         function handleSearch(query) {
-            const q = query.toLowerCase();
+            const rawQ = query.trim();
+            const q = removeVietnameseTones(rawQ); // Normalize for search
             const clearBtn = document.getElementById('clear-search');
             
-            if(q.length > 0) {
+            if(rawQ.length > 0) {
                 clearBtn.classList.remove('hidden');
-                // Auto switch to products tab if not there
                 if(currentTab !== 'products') switchTab('products');
             } else {
                 clearBtn.classList.add('hidden');
             }
 
-            const filtered = productsDB.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+            const filtered = productsDB.filter(p => {
+                // Search against Name, Category, and Hidden Keywords (Vietnamese)
+                return removeVietnameseTones(p.name).includes(q) || 
+                       removeVietnameseTones(p.category).includes(q) ||
+                       (p.keywords && removeVietnameseTones(p.keywords).includes(q));
+            });
+
             renderProductGrid(filtered, 'products-grid');
-            document.getElementById('products-title').innerText = q ? `Search: "${query}"` : "All Products";
+            
+            const titleEl = document.getElementById('products-title');
+            const termEl = document.getElementById('search-term-display');
+            
+            if(rawQ) {
+                titleEl.innerText = "Search Results";
+                if(termEl) termEl.innerText = rawQ;
+            } else {
+                titleEl.innerText = "All Products";
+            }
         }
 
         function clearSearch() {
@@ -513,7 +557,8 @@
         function filterCategory(cat) {
             switchTab('products');
             const input = document.getElementById('search-input');
-            input.value = ''; // clear text search when clicking category
+            input.value = ''; 
+            document.getElementById('clear-search').classList.add('hidden');
             
             let filtered;
             if (cat === 'all') {
@@ -521,7 +566,6 @@
                 document.getElementById('products-title').innerText = "All Products";
             } else {
                 filtered = productsDB.filter(p => p.category === cat);
-                // Capitalize first letter
                 document.getElementById('products-title').innerText = cat.charAt(0).toUpperCase() + cat.slice(1);
             }
             renderProductGrid(filtered, 'products-grid');
@@ -530,9 +574,7 @@
         // --- AUTH LOGIC ---
 
         function switchToRegister() {
-            // Manually show the register view which is an overlay, not a main tab
             document.getElementById('view-register').classList.remove('hidden');
-            // Hide cart float
             document.getElementById('cart-float').classList.add('scale-0');
             currentTab = 'register';
         }
@@ -552,14 +594,10 @@
                 return;
             }
 
-            // Mock Registration
             currentUser = { name: name, phone: phone };
             showToast(`Welcome, <b>${name}</b>!`);
-            
-            // Switch back to user tab
             switchTab('user');
             
-            // Clear form
             document.getElementById('reg-name').value = '';
             document.getElementById('reg-phone').value = '';
             document.getElementById('reg-pass').value = '';
@@ -574,31 +612,42 @@
         function switchTab(tabName) {
             currentTab = tabName;
             
-            // Hide all views including register overlay
+            // If switching to products, reset search to show all items
+            if (tabName === 'products') {
+                const input = document.getElementById('search-input');
+                if (input.value.trim() !== '') {
+                    // Optional: decide if you want to keep search state or clear it. 
+                    // Clearing it ensures the user sees products when they tap the nav icon.
+                    // Let's clear it for a "fresh" start feeling.
+                    input.value = '';
+                    handleSearch(''); 
+                } else if(document.getElementById('products-grid').children.length === 0) {
+                     // If grid is empty (no results) and input empty, reset to all
+                     handleSearch('');
+                }
+            }
+
             ['home', 'products', 'cart', 'user'].forEach(v => {
                 document.getElementById(`view-${v}`).classList.add('hidden');
             });
-            document.getElementById('view-register').classList.add('hidden'); // Ensure reg is closed
+            document.getElementById('view-register').classList.add('hidden');
             
-            // Update Nav Colors
             document.querySelectorAll('.nav-item').forEach(el => {
                 el.classList.remove('text-brand');
                 el.classList.add('text-gray-400');
             });
 
-            // Show selected view & Highlight Nav
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
             document.getElementById(`nav-${tabName}`).classList.add('text-brand');
             document.getElementById(`nav-${tabName}`).classList.remove('text-gray-400');
 
-            // Specific View Logic
             const cartFloat = document.getElementById('cart-float');
             if (tabName === 'cart' || tabName === 'user') {
                 if(tabName === 'cart') renderCart();
                 if(tabName === 'user') renderUserView();
-                cartFloat.classList.add('scale-0'); // Hide float button
+                cartFloat.classList.add('scale-0');
             } else {
-                updateCartUI(); // Restore float button if needed
+                updateCartUI();
             }
         }
 
@@ -611,7 +660,6 @@
             toast.classList.add('animate-bounce-in');
             toast.style.opacity = '1';
             
-            // Reset animation
             setTimeout(() => {
                 toast.style.opacity = '0';
                 toast.classList.remove('animate-bounce-in');
