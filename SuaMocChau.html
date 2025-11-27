@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moc Chau Milk App</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .bg-brand { background-color: #008744; }
+        .text-brand { color: #008744; }
+        .border-brand { border-color: #008744; }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .animate-bounce-in { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="flex justify-center min-h-screen bg-gray-200">
+
+    <!-- Mobile Container Wrapper -->
+    <div class="w-full max-w-md h-[100vh] bg-gray-50 relative shadow-2xl overflow-hidden flex flex-col">
+        
+        <!-- HEADER -->
+        <header class="bg-brand text-white p-4 pt-8 sticky top-0 z-20 shadow-md">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2" onclick="switchTab('home')">
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-brand font-bold text-xs cursor-pointer">MCM</div>
+                    <div class="cursor-pointer">
+                        <h1 class="font-bold text-lg leading-none">Moc Chau Milk</h1>
+                        <p class="text-xs text-green-100 opacity-90">Green meadows, cool milk</p>
+                    </div>
+                </div>
+                <div class="relative cursor-pointer" onclick="showToast('Notifications feature coming soon')">
+                    <i class="fa-regular fa-bell text-xl"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">2</span>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative">
+                <input id="search-input" type="text" placeholder="Search milk, yogurt..." 
+                       class="w-full py-2.5 pl-10 pr-4 rounded-xl text-sm text-gray-700 focus:outline-none shadow-sm transition-all focus:ring-2 focus:ring-green-300"
+                       oninput="handleSearch(this.value)">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
+                <i class="fa-solid fa-xmark absolute right-3 top-3 text-gray-400 text-sm cursor-pointer hidden" id="clear-search" onclick="clearSearch()"></i>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main id="main-content" class="flex-1 overflow-y-auto pb-24 hide-scrollbar bg-gray-50">
+            
+            <!-- VIEW: HOME -->
+            <div id="view-home" class="block animate-fade-in">
+                <!-- Banner Slider -->
+                <div class="mt-4 px-4">
+                    <div class="relative w-full h-40 rounded-2xl overflow-hidden shadow-lg bg-green-200">
+                        <img src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=800&auto=format&fit=crop" 
+                             alt="Moc Chau Farm" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-6 text-white">
+                            <span class="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded w-fit mb-2">HOT DEAL</span>
+                            <h2 class="text-xl font-bold mb-1">Buy 2 Get 1 Free</h2>
+                            <p class="text-sm opacity-90">Famous Black Rice Yogurt</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories -->
+                <div class="mt-6 px-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-gray-800">Categories</h3>
+                        <span class="text-xs text-brand font-medium cursor-pointer" onclick="switchTab('products')">See all</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-4 text-center">
+                        <div onclick="filterCategory('milk')" class="flex flex-col items-center gap-2 cursor-pointer group hover:scale-105 transition">
+                            <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center border border-blue-100"><i class="fa-solid fa-bottle-water text-blue-500 text-xl"></i></div>
+                            <span class="text-xs font-medium text-gray-600">Milk</span>
+                        </div>
+                        <div onclick="filterCategory('yogurt')" class="flex flex-col items-center gap-2 cursor-pointer group hover:scale-105 transition">
+                            <div class="w-14 h-14 bg-pink-50 rounded-2xl flex items-center justify-center border border-pink-100"><i class="fa-solid fa-ice-cream text-pink-500 text-xl"></i></div>
+                            <span class="text-xs font-medium text-gray-600">Yogurt</span>
+                        </div>
+                        <div onclick="filterCategory('cheese')" class="flex flex-col items-center gap-2 cursor-pointer group hover:scale-105 transition">
+                            <div class="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center border border-yellow-100"><i class="fa-solid fa-cheese text-yellow-500 text-xl"></i></div>
+                            <span class="text-xs font-medium text-gray-600">Cheese</span>
+                        </div>
+                        <div onclick="filterCategory('organic')" class="flex flex-col items-center gap-2 cursor-pointer group hover:scale-105 transition">
+                            <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center border border-green-100"><i class="fa-solid fa-leaf text-green-600 text-xl"></i></div>
+                            <span class="text-xs font-medium text-gray-600">Organic</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Products (Subset of all products) -->
+                <div class="mt-8 px-4 pb-4">
+                    <h3 class="font-bold text-gray-800 mb-4 text-lg">Best Sellers 🔥</h3>
+                    <div id="home-products-grid" class="grid grid-cols-2 gap-4">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: PRODUCTS (Search Results / Category Filter) -->
+            <div id="view-products" class="hidden px-4 pt-4 pb-4">
+                <div class="flex justify-between items-end mb-4">
+                    <h3 class="font-bold text-gray-800 text-lg" id="products-title">All Products</h3>
+                    <span class="text-xs text-gray-500" id="products-count">0 items</span>
+                </div>
+                <!-- Filter Chips -->
+                <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-4">
+                    <button onclick="filterCategory('all')" class="px-3 py-1 bg-brand text-white rounded-full text-xs whitespace-nowrap">All</button>
+                    <button onclick="filterCategory('milk')" class="px-3 py-1 bg-white border border-gray-200 text-gray-600 rounded-full text-xs whitespace-nowrap">Fresh Milk</button>
+                    <button onclick="filterCategory('yogurt')" class="px-3 py-1 bg-white border border-gray-200 text-gray-600 rounded-full text-xs whitespace-nowrap">Yogurt</button>
+                    <button onclick="filterCategory('cheese')" class="px-3 py-1 bg-white border border-gray-200 text-gray-600 rounded-full text-xs whitespace-nowrap">Cheese</button>
+                </div>
+
+                <div id="products-grid" class="grid grid-cols-2 gap-4">
+                    <!-- Filled by JS -->
+                </div>
+                
+                <!-- Empty State -->
+                <div id="products-empty" class="hidden flex flex-col items-center justify-center py-10 text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass text-4xl mb-3 opacity-50"></i>
+                    <p>No products found.</p>
+                </div>
+            </div>
+
+            <!-- VIEW: CART -->
+            <div id="view-cart" class="hidden px-4 pt-4 h-full flex flex-col">
+                <h3 class="font-bold text-gray-800 text-lg mb-4">My Cart</h3>
+                
+                <div id="cart-items-container" class="flex-1 overflow-y-auto hide-scrollbar space-y-3 pb-4">
+                    <!-- Cart items injected here -->
+                </div>
+
+                <!-- Empty Cart State -->
+                <div id="cart-empty" class="hidden flex flex-col items-center justify-center h-64 text-gray-400">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                        <i class="fa-solid fa-basket-shopping text-2xl opacity-50"></i>
+                    </div>
+                    <p class="font-medium">Your cart is empty</p>
+                    <button onclick="switchTab('products')" class="mt-4 px-6 py-2 bg-brand text-white rounded-lg text-sm font-medium">Start Shopping</button>
+                </div>
+
+                <!-- Cart Footer (Total & Checkout) -->
+                <div id="cart-footer" class="mt-auto border-t border-gray-200 pt-4 pb-4 bg-gray-50 sticky bottom-0">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-gray-600 font-medium">Total:</span>
+                        <span id="cart-total" class="text-xl font-bold text-brand">0k</span>
+                    </div>
+                    <button onclick="showToast('Order feature coming soon!')" class="w-full bg-brand text-white py-3 rounded-xl font-bold shadow-lg shadow-green-200 active:scale-95 transition">
+                        Checkout Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- VIEW: ACCOUNT (Simple Placeholder) -->
+            <div id="view-user" class="hidden px-4 pt-10 flex flex-col items-center">
+                <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4 border-4 border-white shadow-md">
+                    <i class="fa-solid fa-user text-3xl text-gray-400"></i>
+                </div>
+                <h3 class="font-bold text-lg">Guest User</h3>
+                <p class="text-gray-500 text-sm mb-6">Join Member for exclusive deals</p>
+                
+                <div class="w-full space-y-2">
+                    <button class="w-full bg-white border border-gray-200 p-3 rounded-xl text-left flex items-center gap-3">
+                        <i class="fa-solid fa-clipboard-list text-brand"></i> Order History
+                    </button>
+                    <button class="w-full bg-white border border-gray-200 p-3 rounded-xl text-left flex items-center gap-3">
+                        <i class="fa-solid fa-location-dot text-brand"></i> My Addresses
+                    </button>
+                    <button class="w-full bg-white border border-gray-200 p-3 rounded-xl text-left flex items-center gap-3 text-red-500">
+                        <i class="fa-solid fa-right-from-bracket"></i> Log Out
+                    </button>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- CART FLOATING BUTTON (Only visible on Home/Products when cart > 0) -->
+        <div id="cart-float" onclick="switchTab('cart')" class="absolute bottom-24 right-4 bg-yellow-500 text-white p-3 rounded-full shadow-lg transform scale-0 transition-transform duration-300 flex items-center justify-center z-10 cursor-pointer hover:bg-yellow-600">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span id="cart-count-float" class="absolute -top-1 -right-1 bg-red-600 text-[10px] w-5 h-5 flex items-center justify-center rounded-full border border-white">0</span>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <nav class="bg-white border-t border-gray-100 flex justify-between items-center px-6 py-3 absolute bottom-0 w-full z-20">
+            <div id="nav-home" class="nav-item flex flex-col items-center gap-1 cursor-pointer text-brand transition" onclick="switchTab('home')">
+                <i class="fa-solid fa-house text-xl"></i>
+                <span class="text-[10px] font-medium">Home</span>
+            </div>
+            <div id="nav-products" class="nav-item flex flex-col items-center gap-1 cursor-pointer text-gray-400 hover:text-brand transition" onclick="switchTab('products')">
+                <i class="fa-solid fa-box-open text-xl"></i>
+                <span class="text-[10px] font-medium">Products</span>
+            </div>
+            <div id="nav-cart" class="nav-item flex flex-col items-center gap-1 cursor-pointer text-gray-400 hover:text-brand transition" onclick="switchTab('cart')">
+                <div class="relative">
+                    <i class="fa-solid fa-basket-shopping text-xl"></i>
+                    <span id="cart-badge-nav" class="hidden absolute -top-1 -right-2 bg-red-500 text-white text-[9px] w-3.5 h-3.5 flex items-center justify-center rounded-full">0</span>
+                </div>
+                <span class="text-[10px] font-medium">Cart</span>
+            </div>
+            <div id="nav-user" class="nav-item flex flex-col items-center gap-1 cursor-pointer text-gray-400 hover:text-brand transition" onclick="switchTab('user')">
+                <i class="fa-regular fa-user text-xl"></i>
+                <span class="text-[10px] font-medium">Account</span>
+            </div>
+        </nav>
+
+        <!-- TOAST NOTIFICATION -->
+        <div id="toast" class="absolute top-20 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 w-11/12 max-w-sm opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+            <div class="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                <i class="fa-solid fa-check text-xs"></i>
+            </div>
+            <p id="toast-message" class="text-sm font-medium">Notification</p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. DATA DATABASE ---
+        const productsDB = [
+            { id: 1, name: "UHT Fresh Milk Less Sugar 180ml", price: 315, unit: "box", oldPrice: 350, discount: "-10%", category: "milk", img: "https://images.unsplash.com/photo-1563636619-e9143da7973b?q=80&w=400&auto=format&fit=crop" },
+            { id: 2, name: "Moc Chau Black Rice Yogurt", price: 120, unit: "pack", category: "yogurt", img: "https://images.unsplash.com/photo-1571212515416-f786d79a2f64?q=80&w=400&auto=format&fit=crop" },
+            { id: 3, name: "Pasteurized Fresh Milk 900ml", price: 42, unit: "bottle", category: "milk", img: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?q=80&w=400&auto=format&fit=crop" },
+            { id: 4, name: "Moc Chau Pistachio Milk", price: 55, unit: "pack", category: "milk", img: "https://images.unsplash.com/photo-1559598467-f8b76c8155d0?q=80&w=400&auto=format&fit=crop" },
+            { id: 5, name: "Cheese Stick (Kids)", price: 85, unit: "box", category: "cheese", img: "https://images.unsplash.com/photo-1624806992098-b8ce17d23a63?q=80&w=400&auto=format&fit=crop" },
+            { id: 6, name: "Organic Yogurt Plain", price: 45, unit: "cup", category: "organic", img: "https://images.unsplash.com/photo-1488477184539-778db12191b7?q=80&w=400&auto=format&fit=crop" },
+            { id: 7, name: "Strawberry Milk 180ml", price: 320, unit: "box", category: "milk", img: "https://images.unsplash.com/photo-1576186726580-a816e8b12896?q=80&w=400&auto=format&fit=crop" },
+            { id: 8, name: "Greek Yogurt", price: 60, unit: "cup", category: "yogurt", img: "https://images.unsplash.com/photo-1571026456044-a0d4c8033604?q=80&w=400&auto=format&fit=crop" }
+        ];
+
+        // --- 2. STATE ---
+        let cart = []; // Array of {id, qty}
+        let currentTab = 'home';
+
+        // --- 3. INIT ---
+        window.onload = () => {
+            renderProductGrid(productsDB.slice(0, 4), 'home-products-grid'); // Best sellers
+            renderProductGrid(productsDB, 'products-grid'); // All products
+        };
+
+        // --- 4. RENDER FUNCTIONS ---
+        function renderProductGrid(products, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (products.length === 0) {
+                if(containerId === 'products-grid') document.getElementById('products-empty').classList.remove('hidden');
+                return;
+            }
+            if(containerId === 'products-grid') document.getElementById('products-empty').classList.add('hidden');
+
+            products.forEach(p => {
+                const card = `
+                <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition">
+                    <div class="relative h-32 w-full bg-gray-100 rounded-xl overflow-hidden mb-3">
+                        <img src="${p.img}" class="w-full h-full object-cover" alt="${p.name}">
+                        ${p.discount ? `<span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">${p.discount}</span>` : ''}
+                    </div>
+                    <h4 class="text-sm font-semibold text-gray-800 line-clamp-2 h-10">${p.name}</h4>
+                    <div class="mt-auto pt-2 flex justify-between items-end">
+                        <div>
+                            ${p.oldPrice ? `<span class="text-xs text-gray-400 line-through">${p.oldPrice}k</span>` : ''}
+                            <div class="text-brand font-bold text-sm">${p.price}k/${p.unit}</div>
+                        </div>
+                        <button onclick="addToCart(${p.id})" class="w-8 h-8 bg-brand rounded-full text-white flex items-center justify-center hover:bg-green-700 transition shadow-md shadow-green-200 active:scale-90">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                </div>`;
+                container.innerHTML += card;
+            });
+            
+            // Update counts
+            if(containerId === 'products-grid') {
+                document.getElementById('products-count').innerText = `${products.length} items`;
+            }
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            const footer = document.getElementById('cart-footer');
+            const emptyState = document.getElementById('cart-empty');
+            
+            container.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                container.classList.add('hidden');
+                footer.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                document.getElementById('cart-total').innerText = '0k';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            footer.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            cart.forEach(item => {
+                const product = productsDB.find(p => p.id === item.id);
+                if (!product) return;
+                
+                const itemTotal = product.price * item.qty;
+                total += itemTotal;
+
+                const row = `
+                <div class="flex items-center bg-white p-3 rounded-xl border border-gray-100 gap-3">
+                    <img src="${product.img}" class="w-16 h-16 rounded-lg object-cover bg-gray-100">
+                    <div class="flex-1">
+                        <h4 class="text-sm font-semibold text-gray-800 line-clamp-1">${product.name}</h4>
+                        <p class="text-brand font-bold text-sm">${product.price}k <span class="text-gray-400 text-xs font-normal">/${product.unit}</span></p>
+                    </div>
+                    <div class="flex flex-col items-end gap-2">
+                        <button onclick="removeFromCart(${item.id})" class="text-gray-300 hover:text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        <div class="flex items-center bg-gray-100 rounded-lg h-7">
+                            <button onclick="changeQty(${item.id}, -1)" class="w-7 h-full flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-l-lg">-</button>
+                            <span class="text-xs font-bold w-6 text-center">${item.qty}</span>
+                            <button onclick="changeQty(${item.id}, 1)" class="w-7 h-full flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-r-lg">+</button>
+                        </div>
+                    </div>
+                </div>`;
+                container.innerHTML += row;
+            });
+
+            document.getElementById('cart-total').innerText = total + 'k';
+        }
+
+        // --- 5. LOGIC ACTIONS ---
+
+        function addToCart(id) {
+            const existingItem = cart.find(item => item.id === id);
+            const product = productsDB.find(p => p.id === id);
+
+            if (existingItem) {
+                existingItem.qty++;
+            } else {
+                cart.push({ id: id, qty: 1 });
+            }
+            
+            updateCartUI();
+            showToast(`Added <b>${product.name}</b>`);
+        }
+
+        function changeQty(id, change) {
+            const item = cart.find(i => i.id === id);
+            if (!item) return;
+
+            item.qty += change;
+            if (item.qty <= 0) {
+                removeFromCart(id);
+                return; // removeFromCart handles UI update
+            }
+            updateCartUI();
+            renderCart(); // Re-render logic for cart view
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCartUI();
+            renderCart();
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            
+            // Update Float Button
+            const floatBtn = document.getElementById('cart-float');
+            const floatCount = document.getElementById('cart-count-float');
+            floatCount.innerText = totalItems;
+            
+            // Only show float if items > 0 AND not on cart page
+            if (totalItems > 0 && currentTab !== 'cart') {
+                floatBtn.classList.remove('scale-0');
+            } else {
+                floatBtn.classList.add('scale-0');
+            }
+
+            // Update Nav Badge
+            const navBadge = document.getElementById('cart-badge-nav');
+            navBadge.innerText = totalItems;
+            if(totalItems > 0) navBadge.classList.remove('hidden');
+            else navBadge.classList.add('hidden');
+        }
+
+        function handleSearch(query) {
+            const q = query.toLowerCase();
+            const clearBtn = document.getElementById('clear-search');
+            
+            if(q.length > 0) {
+                clearBtn.classList.remove('hidden');
+                // Auto switch to products tab if not there
+                if(currentTab !== 'products') switchTab('products');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            const filtered = productsDB.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+            renderProductGrid(filtered, 'products-grid');
+            document.getElementById('products-title').innerText = q ? `Search: "${query}"` : "All Products";
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('search-input');
+            input.value = '';
+            handleSearch('');
+        }
+
+        function filterCategory(cat) {
+            switchTab('products');
+            const input = document.getElementById('search-input');
+            input.value = ''; // clear text search when clicking category
+            
+            let filtered;
+            if (cat === 'all') {
+                filtered = productsDB;
+                document.getElementById('products-title').innerText = "All Products";
+            } else {
+                filtered = productsDB.filter(p => p.category === cat);
+                // Capitalize first letter
+                document.getElementById('products-title').innerText = cat.charAt(0).toUpperCase() + cat.slice(1);
+            }
+            renderProductGrid(filtered, 'products-grid');
+        }
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            
+            // Hide all views
+            ['home', 'products', 'cart', 'user'].forEach(v => {
+                document.getElementById(`view-${v}`).classList.add('hidden');
+            });
+            
+            // Update Nav Colors
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('text-brand');
+                el.classList.add('text-gray-400');
+            });
+
+            // Show selected view & Highlight Nav
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).classList.add('text-brand');
+            document.getElementById(`nav-${tabName}`).classList.remove('text-gray-400');
+
+            // Specific View Logic
+            const cartFloat = document.getElementById('cart-float');
+            if (tabName === 'cart') {
+                renderCart();
+                cartFloat.classList.add('scale-0'); // Hide float button on cart page
+            } else {
+                updateCartUI(); // Restore float button if needed
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerHTML = message;
+            
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-[-10px]');
+            toast.classList.add('animate-bounce-in');
+            toast.style.opacity = '1';
+            
+            // Reset animation
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.classList.remove('animate-bounce-in');
+                toast.classList.add('translate-y-[-10px]');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
